@@ -1,0 +1,24 @@
+{
+  "name": "test-generator",
+  "version": "1.0.0",
+  "description": "Generate tests for functions",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "tsc --watch",
+    "generate-tests": "node dist/index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/lodash": "^4.14.155",
+    "@types/node": "^14.0.13",
+    "babylon": "^7.0.0-beta.47",
+    "lodash": "^4.17.15",
+    "recast": "^0.19.1"
+  },
+  "devDependencies": {
+    "parcel-bundler": "^1.12.4",
+    "typescript": "^3.9.5"
+  }
+}
