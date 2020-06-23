@@ -2,91 +2,88 @@ import fs from 'fs';
 import Generators from './generators';
 import Queries from './queries';
 import Transformers from './transformers';
-import {
-    namedTypes as n,
-} from "ast-types";
+import { namedTypes as n } from 'ast-types';
 
-interface CommandOptions {
-    input?: string;
-    output?:string;
-    debug?:boolean;
+interface ICommandOptions {
+  input?: string;
+  output?: string;
+  debug?: boolean;
 }
 
 namespace Commands {
-    export type COMMANDS = "listFunctions" | "help";
-    export function commandHandler(args: string[]) {
-        const commandName = args[2] as Commands.COMMANDS || "help";
-        if (!Commands[commandName]) {
-            throw new Error("No command given");
-        }
-
-        const options = argumentsToObjectOptions(args.slice(3));
-
-        Commands[commandName](options);
-
+  export type TCOMMANDS = 'listFunctions' | 'help';
+  export function commandHandler(args: string[]) {
+    const commandName = (args[2] as Commands.TCOMMANDS) || 'help';
+    if (!Commands[commandName]) {
+      throw new Error('No command given');
     }
 
-    function argumentsToObjectOptions( args: any[] ):Partial<CommandOptions>{
-        return args.reduce((accu, el)=>{
-            if(el.includes("=")){
-                const splitted = el.split("=");
-                accu[splitted[0].replace(/-/g,'')] = splitted[1];
-                return accu;
-            }else{
-                accu[el] = true;
-                return accu
-            }
-        },{});
+    const options = argumentsToObjectOptions(args.slice(3));
+
+    Commands[commandName](options);
+  }
+
+  function argumentsToObjectOptions(args: any[]): Partial<ICommandOptions> {
+    return args.reduce((accu, el) => {
+      if (el.includes('=')) {
+        const splitted = el.split('=');
+        accu[splitted[0].replace(/-/g, '')] = splitted[1];
+        return accu;
+      } else {
+        accu[el] = true;
+        return accu;
+      }
+    }, {});
+  }
+
+  export function listFunctions(options: ICommandOptions) {
+    const fileContent = fs.readFileSync(options.input);
+    const ast = Generators.generateAst(fileContent.toString());
+
+    const queryResult = Queries.findAllFunctionDeclarations(ast);
+
+    const transformed = Transformers.genEmptyFunctionName(queryResult as n.FunctionDeclaration[]);
+
+    const builded = Generators.buildFile(transformed);
+
+    const result = Generators.printAst(builded);
+
+    if (!options.output) {
+      console.log(result);
+      return;
     }
 
-    export function listFunctions(options:CommandOptions) {
-        const fileContent =  fs.readFileSync( options.input );
-        const ast = Generators.generateAst(fileContent.toString());
+    fs.writeFileSync(options.output, result.code);
+  }
 
-        const queryResult = Queries.findAllFunctionDeclarations(ast);
+  export function generateTests(options: ICommandOptions) {
+    const fileContent = fs.readFileSync(options.input);
+    const ast = Generators.generateAst(fileContent.toString());
 
-        const transformed = Transformers.genEmptyFunctionName(queryResult as n.FunctionDeclaration[]);
-
-        const builded = Generators.buildFile(transformed);
-
-        const result = Generators.printAst( builded );
-
-        if(!options.output){
-            console.log(result)
-            return;
-        }
-
-        fs.writeFileSync( options.output, result.code );
+    if (options.debug) {
+      // @ts-ignore
+      console.log(ast.program.body[0].body.body[0].declarations[0].init.callee);
     }
 
-    export function generateTests(options:CommandOptions) {
-        const fileContent =  fs.readFileSync( options.input );
-        const ast = Generators.generateAst(fileContent.toString());
+    const queryResult = Queries.findAllFunctionDeclarations(ast);
 
-        if(options.debug){
-            // @ts-ignore
-          console.log(ast.program.body[0].body.body[0].declarations[0].init.callee);
-        }
+    const transformed = Transformers.runJestTransformer(queryResult);
 
-        const queryResult = Queries.findAllFunctionDeclarations(ast);
+    const builded = Generators.buildFile(transformed);
 
-        const transformed = Transformers.runJestTransformer(queryResult);
+    const result = Generators.printAst(builded);
 
-        const builded = Generators.buildFile(transformed);
-
-        const result = Generators.printAst( builded );
-
-        if(!options.output){
-            console.log(result)
-            return;
-        }
-
-        fs.writeFileSync( options.output, result.code );
+    if (!options.output) {
+      console.log(result);
+      return;
     }
 
-    export function help() {
-        console.log("Print all commands");
-    }
+    fs.writeFileSync(options.output, result.code);
+  }
+
+  export function help() {
+    console.log('Print all commands');
+  }
 }
 
 export default Commands;
