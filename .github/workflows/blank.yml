@@ -27,5 +27,5 @@ jobs:
     # Runs a single command using the runners shell
     - name: Run install and test
       run: |
-        npm install
-        npm run test
+        yarn install
+        yarn run test
