@@ -1,5 +1,5 @@
-describe("Should run test", ()=>{
-    test("example test", ()=>{
-      expect("unexpected").toBeTruthy();
-    })
-})
+describe('Should run test', () => {
+  test('example test', () => {
+    expect('unexpected').toBeTruthy();
+  });
+});
