@@ -4,7 +4,7 @@
   "description": "Generate tests for functions",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "start": "tsc --watch",
     "generate-tests": "node dist/index.js",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx --quiet --fix",
