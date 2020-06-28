@@ -19,7 +19,8 @@
     "babylon": "^7.0.0-beta.47",
     "jest": "^26.0.1",
     "lodash": "^4.17.15",
-    "recast": "^0.19.1"
+    "recast": "^0.19.1",
+    "ts-jest": "^26.1.1"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^3.3.0",
