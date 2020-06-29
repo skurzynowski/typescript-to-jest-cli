@@ -1,5 +1,5 @@
 import { visit, namedTypes as n } from 'ast-types';
-import { get } from 'lodash';
+import get from 'lodash/get';
 
 namespace Queries {
   export const findAllFunctionDeclarations = (ast: n.ASTNode): n.FunctionDeclaration[] => {
