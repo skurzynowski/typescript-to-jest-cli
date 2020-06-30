@@ -1,4 +1,5 @@
 import { visit, namedTypes as n } from 'ast-types';
+import get from 'lodash/get';
 
 namespace Queries {
   export const findAllFunctionDeclarations = (ast: n.ASTNode): n.FunctionDeclaration[] => {
@@ -14,6 +15,26 @@ namespace Queries {
 
     return nodes;
   };
+
+  export function getReturnType(functionNode: n.FunctionDeclaration): string {
+    let result;
+
+    //handle type reference as array for example
+    if (get(functionNode, 'returnType.typeAnnotation.type') === 'TSTypeReference') {
+      result = get(functionNode, 'returnType.typeAnnotation.typeName.name');
+    }
+
+    //handle annotation like string for example
+    if (!result) {
+      result = get(functionNode, 'returnType.typeAnnotation.type');
+    }
+
+    if (!result) {
+      return 'no return ts annotiation';
+    }
+
+    return result;
+  }
 
   export const findAllFunctionExpression = (ast: n.ASTNode): n.FunctionExpression[] => {
     const nodes: n.FunctionExpression[] = [];
